@@ -244,7 +244,7 @@ const S = {
   screen: {
     minHeight: '100dvh',
     background: COLORS.bgGradient,
-    padding: 'env(safe-area-inset-top, 20px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 16px)',
+    padding: 'max(env(safe-area-inset-top, 20px), 54px) max(env(safe-area-inset-right, 16px), 16px) max(env(safe-area-inset-bottom, 20px), 20px) max(env(safe-area-inset-left, 16px), 16px)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
@@ -772,7 +772,7 @@ export default function App() {
     const goalReached = reviewed >= DAILY_GOAL
 
     return (
-      <div style={{ ...S.screen, gap: '16px', paddingTop: 'max(env(safe-area-inset-top, 20px), 20px)' }}>
+      <div style={{ ...S.screen, gap: '16px' }}>
         {/* Header */}
         <div style={{ animation: 'fadeIn 0.4s ease' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
