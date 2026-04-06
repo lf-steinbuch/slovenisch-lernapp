@@ -200,6 +200,21 @@ function shuffle(arr) {
   return a
 }
 
+const PIN_ANIMALS = [
+  'Fuchs', 'Bär', 'Wolf', 'Adler', 'Hase', 'Reh', 'Luchs', 'Dachs',
+  'Otter', 'Igel', 'Eule', 'Falke', 'Hirsch', 'Marder', 'Biber',
+  'Storch', 'Drossel', 'Gecko', 'Panda', 'Koala', 'Tiger', 'Löwe',
+  'Delfin', 'Pinguin', 'Möwe', 'Elch', 'Flamingo', 'Kolibri',
+]
+
+const SCHNAPS_ZAHLEN = [11, 22, 33, 44, 55, 66, 77, 88, 99]
+
+function generatePin() {
+  const animal = PIN_ANIMALS[Math.floor(Math.random() * PIN_ANIMALS.length)]
+  const num = SCHNAPS_ZAHLEN[Math.floor(Math.random() * SCHNAPS_ZAHLEN.length)]
+  return `${animal}${num}`
+}
+
 function speak(text) {
   if (!window.speechSynthesis) return
   window.speechSynthesis.cancel()
@@ -356,7 +371,10 @@ export default function App() {
   const [error, setError] = useState('')
 
   // Onboarding
+  const [authMode, setAuthMode] = useState('choose') // 'choose', 'register', 'login', 'showPin'
   const [nameInput, setNameInput] = useState('')
+  const [pinInput, setPinInput] = useState('')
+  const [generatedPin, setGeneratedPin] = useState('')
   const [nameError, setNameError] = useState('')
   const [nameLoading, setNameLoading] = useState(false)
 
@@ -470,7 +488,6 @@ export default function App() {
     setNameLoading(true)
     setNameError('')
     try {
-      // check uniqueness
       const { data: existing } = await supabase
         .from('players')
         .select('id')
@@ -481,11 +498,13 @@ export default function App() {
         setNameLoading(false)
         return
       }
+      const pin = generatePin()
       const today = getToday()
       const { data, error } = await supabase
         .from('players')
         .insert({
           name,
+          pin,
           xp: 0,
           streak_count: 0,
           streak_last_date: null,
@@ -498,9 +517,54 @@ export default function App() {
       if (error) throw error
       localStorage.setItem('slovensko_player_id', data.id)
       setPlayer(data)
-      setScreen('home')
+      setGeneratedPin(pin)
+      setAuthMode('showPin')
     } catch (e) {
       setNameError('Fehler bei der Registrierung. Versuche es erneut.')
+    }
+    setNameLoading(false)
+  }
+
+  async function handleLogin() {
+    const name = nameInput.trim()
+    const pin = pinInput.trim()
+    if (!name || !pin) { setNameError('Name und PIN eingeben'); return }
+    setNameLoading(true)
+    setNameError('')
+    try {
+      const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .eq('name', name)
+        .eq('pin', pin)
+        .maybeSingle()
+      if (!data) {
+        setNameError('Name oder PIN falsch')
+        setNameLoading(false)
+        return
+      }
+      localStorage.setItem('slovensko_player_id', data.id)
+      // Day rollover
+      const today = getToday()
+      let updates = {}
+      if (data.today_date !== today) {
+        updates.today_reviewed = 0
+        updates.today_date = today
+        if (data.streak_last_date) {
+          const diff = daysBetween(data.streak_last_date, today)
+          if (diff > 1) updates.streak_count = 0
+        }
+      }
+      if (Object.keys(updates).length > 0) {
+        const { data: updated } = await supabase
+          .from('players').update(updates).eq('id', data.id).select().single()
+        setPlayer(updated || { ...data, ...updates })
+      } else {
+        setPlayer(data)
+      }
+      setScreen('home')
+    } catch {
+      setNameError('Fehler beim Anmelden. Versuche es erneut.')
     }
     setNameLoading(false)
   }
@@ -722,42 +786,152 @@ export default function App() {
 
   // -- Onboarding --
   if (screen === 'onboarding') {
-    return (
-      <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '32px', padding: '24px' }}>
-        <div style={{ textAlign: 'center', animation: 'fadeIn 0.6s ease' }}>
-          <div style={{ fontSize: '64px', marginBottom: '12px' }}>🇸🇮</div>
-          <h1 style={S.title}>Slovensko!</h1>
-          <p style={{ ...S.subtitle, marginTop: '8px' }}>Lerne Slowenisch mit deinen Cousins</p>
-        </div>
-        <div style={{ width: '100%', maxWidth: '340px', animation: 'slideUp 0.6s ease 0.2s both' }}>
-          <input
-            style={{
-              ...S.input,
-              borderColor: nameError ? COLORS.danger : COLORS.surfaceLight,
-              textAlign: 'center',
-            }}
-            placeholder="Dein Name"
-            value={nameInput}
-            onChange={e => { setNameInput(e.target.value); setNameError('') }}
-            onKeyDown={e => e.key === 'Enter' && handleRegister()}
-            maxLength={20}
-            autoFocus
-          />
-          {nameError && (
-            <p style={{ color: COLORS.danger, fontSize: '13px', marginTop: '8px', textAlign: 'center', animation: 'shake 0.4s ease' }}>
-              {nameError}
-            </p>
-          )}
-          <button
-            style={{ ...S.btn, ...S.btnPrimary, width: '100%', marginTop: '16px', opacity: nameLoading ? 0.6 : 1 }}
-            onClick={handleRegister}
-            disabled={nameLoading}
-          >
-            {nameLoading ? 'Wird geladen...' : "Los geht's! 🚀"}
-          </button>
-        </div>
+    // Header (shared)
+    const header = (
+      <div style={{ textAlign: 'center', animation: 'fadeIn 0.6s ease' }}>
+        <div style={{ fontSize: '64px', marginBottom: '12px' }}>🇸🇮</div>
+        <h1 style={S.title}>Slovensko!</h1>
+        <p style={{ ...S.subtitle, marginTop: '8px' }}>Lerne Slowenisch mit deinen Cousins</p>
       </div>
     )
+
+    // Show PIN after registration
+    if (authMode === 'showPin') {
+      return (
+        <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '24px', padding: '24px' }}>
+          {header}
+          <div style={{ ...S.card, width: '100%', maxWidth: '340px', textAlign: 'center', animation: 'slideUp 0.5s ease' }}>
+            <div style={{ fontSize: '14px', color: COLORS.textMuted, marginBottom: '8px' }}>
+              Dein persönlicher Login-Code:
+            </div>
+            <div style={{
+              fontSize: 'clamp(28px, 7vw, 36px)',
+              fontWeight: '800',
+              color: COLORS.gold,
+              letterSpacing: '2px',
+              padding: '12px 0',
+              animation: 'popIn 0.5s ease',
+            }}>
+              {generatedPin}
+            </div>
+            <div style={{ fontSize: '13px', color: COLORS.textMuted, marginTop: '4px' }}>
+              Merk dir diesen Code — damit kannst du dich auf anderen Geräten anmelden!
+            </div>
+          </div>
+          <button
+            style={{ ...S.btn, ...S.btnPrimary, width: '100%', maxWidth: '340px' }}
+            onClick={() => setScreen('home')}
+          >
+            Verstanden, los geht's! 🚀
+          </button>
+        </div>
+      )
+    }
+
+    // Choose: Register or Login
+    if (authMode === 'choose') {
+      return (
+        <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '32px', padding: '24px' }}>
+          {header}
+          <div style={{ width: '100%', maxWidth: '340px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'slideUp 0.6s ease 0.2s both' }}>
+            <button
+              style={{ ...S.btn, ...S.btnPrimary, width: '100%' }}
+              onClick={() => { setAuthMode('register'); setNameError(''); setNameInput('') }}
+            >
+              Neu hier? Registrieren 🚀
+            </button>
+            <button
+              style={{ ...S.btn, ...S.btnSecondary, width: '100%' }}
+              onClick={() => { setAuthMode('login'); setNameError(''); setNameInput(''); setPinInput('') }}
+            >
+              Ich habe einen Account 🔑
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    // Register
+    if (authMode === 'register') {
+      return (
+        <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '24px', padding: '24px' }}>
+          {header}
+          <div style={{ width: '100%', maxWidth: '340px', animation: 'slideUp 0.5s ease' }}>
+            <input
+              style={{ ...S.input, borderColor: nameError ? COLORS.danger : COLORS.surfaceLight, textAlign: 'center' }}
+              placeholder="Dein Name"
+              value={nameInput}
+              onChange={e => { setNameInput(e.target.value); setNameError('') }}
+              onKeyDown={e => e.key === 'Enter' && handleRegister()}
+              maxLength={20}
+              autoFocus
+            />
+            {nameError && (
+              <p style={{ color: COLORS.danger, fontSize: '13px', marginTop: '8px', textAlign: 'center', animation: 'shake 0.4s ease' }}>
+                {nameError}
+              </p>
+            )}
+            <button
+              style={{ ...S.btn, ...S.btnPrimary, width: '100%', marginTop: '16px', opacity: nameLoading ? 0.6 : 1 }}
+              onClick={handleRegister}
+              disabled={nameLoading}
+            >
+              {nameLoading ? 'Wird geladen...' : 'Registrieren'}
+            </button>
+            <button
+              style={{ ...S.backBtn, width: '100%', justifyContent: 'center', marginTop: '12px' }}
+              onClick={() => setAuthMode('choose')}
+            >
+              ← Zurück
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    // Login
+    if (authMode === 'login') {
+      return (
+        <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '24px', padding: '24px' }}>
+          {header}
+          <div style={{ width: '100%', maxWidth: '340px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'slideUp 0.5s ease' }}>
+            <input
+              style={{ ...S.input, borderColor: nameError ? COLORS.danger : COLORS.surfaceLight, textAlign: 'center' }}
+              placeholder="Dein Name"
+              value={nameInput}
+              onChange={e => { setNameInput(e.target.value); setNameError('') }}
+              maxLength={20}
+              autoFocus
+            />
+            <input
+              style={{ ...S.input, borderColor: nameError ? COLORS.danger : COLORS.surfaceLight, textAlign: 'center' }}
+              placeholder="Dein PIN (z.B. Fuchs33)"
+              value={pinInput}
+              onChange={e => { setPinInput(e.target.value); setNameError('') }}
+              onKeyDown={e => e.key === 'Enter' && handleLogin()}
+            />
+            {nameError && (
+              <p style={{ color: COLORS.danger, fontSize: '13px', textAlign: 'center', animation: 'shake 0.4s ease' }}>
+                {nameError}
+              </p>
+            )}
+            <button
+              style={{ ...S.btn, ...S.btnPrimary, width: '100%', opacity: nameLoading ? 0.6 : 1 }}
+              onClick={handleLogin}
+              disabled={nameLoading}
+            >
+              {nameLoading ? 'Wird geladen...' : 'Anmelden 🔑'}
+            </button>
+            <button
+              style={{ ...S.backBtn, width: '100%', justifyContent: 'center', marginTop: '4px' }}
+              onClick={() => setAuthMode('choose')}
+            >
+              ← Zurück
+            </button>
+          </div>
+        </div>
+      )
+    }
   }
 
   // -- Home --
