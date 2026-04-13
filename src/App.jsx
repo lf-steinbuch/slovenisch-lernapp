@@ -200,21 +200,6 @@ function shuffle(arr) {
   return a
 }
 
-const PIN_ANIMALS = [
-  'Fuchs', 'Bär', 'Wolf', 'Adler', 'Hase', 'Reh', 'Luchs', 'Dachs',
-  'Otter', 'Igel', 'Eule', 'Falke', 'Hirsch', 'Marder', 'Biber',
-  'Storch', 'Drossel', 'Gecko', 'Panda', 'Koala', 'Tiger', 'Löwe',
-  'Delfin', 'Pinguin', 'Möwe', 'Elch', 'Flamingo', 'Kolibri',
-]
-
-const SCHNAPS_ZAHLEN = [11, 22, 33, 44, 55, 66, 77, 88, 99]
-
-function generatePin() {
-  const animal = PIN_ANIMALS[Math.floor(Math.random() * PIN_ANIMALS.length)]
-  const num = SCHNAPS_ZAHLEN[Math.floor(Math.random() * SCHNAPS_ZAHLEN.length)]
-  return `${animal}${num}`
-}
-
 function speak(text) {
   if (!window.speechSynthesis) return
   window.speechSynthesis.cancel()
@@ -371,10 +356,9 @@ export default function App() {
   const [error, setError] = useState('')
 
   // Onboarding
-  const [authMode, setAuthMode] = useState('choose') // 'choose', 'register', 'login', 'showPin'
+  const [authMode, setAuthMode] = useState('choose') // 'choose', 'register', 'login'
   const [nameInput, setNameInput] = useState('')
-  const [pinInput, setPinInput] = useState('')
-  const [generatedPin, setGeneratedPin] = useState('')
+  const [passwordInput, setPasswordInput] = useState('')
   const [nameError, setNameError] = useState('')
   const [nameLoading, setNameLoading] = useState(false)
 
@@ -483,8 +467,10 @@ export default function App() {
   // --------------------------------------------------------
   async function handleRegister() {
     const name = nameInput.trim()
-    if (name.length < 2) { setNameError('Mindestens 2 Zeichen'); return }
-    if (name.length > 20) { setNameError('Maximal 20 Zeichen'); return }
+    const password = passwordInput
+    if (name.length < 2) { setNameError('Name: mindestens 2 Zeichen'); return }
+    if (name.length > 20) { setNameError('Name: maximal 20 Zeichen'); return }
+    if (password.length < 4) { setNameError('Passwort: mindestens 4 Zeichen'); return }
     setNameLoading(true)
     setNameError('')
     try {
@@ -498,13 +484,12 @@ export default function App() {
         setNameLoading(false)
         return
       }
-      const pin = generatePin()
       const today = getToday()
       const { data, error } = await supabase
         .from('players')
         .insert({
           name,
-          pin,
+          password,
           xp: 0,
           streak_count: 0,
           streak_last_date: null,
@@ -517,8 +502,7 @@ export default function App() {
       if (error) throw error
       localStorage.setItem('slovensko_player_id', data.id)
       setPlayer(data)
-      setGeneratedPin(pin)
-      setAuthMode('showPin')
+      setScreen('home')
     } catch (e) {
       setNameError('Fehler bei der Registrierung. Versuche es erneut.')
     }
@@ -527,19 +511,19 @@ export default function App() {
 
   async function handleLogin() {
     const name = nameInput.trim()
-    const pin = pinInput.trim()
-    if (!name || !pin) { setNameError('Name und PIN eingeben'); return }
+    const password = passwordInput
+    if (!name || !password) { setNameError('Name und Passwort eingeben'); return }
     setNameLoading(true)
     setNameError('')
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('players')
         .select('*')
         .eq('name', name)
-        .eq('pin', pin)
+        .eq('password', password)
         .maybeSingle()
       if (!data) {
-        setNameError('Name oder PIN falsch')
+        setNameError('Name oder Passwort falsch')
         setNameLoading(false)
         return
       }
@@ -795,39 +779,6 @@ export default function App() {
       </div>
     )
 
-    // Show PIN after registration
-    if (authMode === 'showPin') {
-      return (
-        <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '24px', padding: '24px' }}>
-          {header}
-          <div style={{ ...S.card, width: '100%', maxWidth: '340px', textAlign: 'center', animation: 'slideUp 0.5s ease' }}>
-            <div style={{ fontSize: '14px', color: COLORS.textMuted, marginBottom: '8px' }}>
-              Dein persönlicher Login-Code:
-            </div>
-            <div style={{
-              fontSize: 'clamp(28px, 7vw, 36px)',
-              fontWeight: '800',
-              color: COLORS.gold,
-              letterSpacing: '2px',
-              padding: '12px 0',
-              animation: 'popIn 0.5s ease',
-            }}>
-              {generatedPin}
-            </div>
-            <div style={{ fontSize: '13px', color: COLORS.textMuted, marginTop: '4px' }}>
-              Merk dir diesen Code — damit kannst du dich auf anderen Geräten anmelden!
-            </div>
-          </div>
-          <button
-            style={{ ...S.btn, ...S.btnPrimary, width: '100%', maxWidth: '340px' }}
-            onClick={() => setScreen('home')}
-          >
-            Verstanden, los geht's! 🚀
-          </button>
-        </div>
-      )
-    }
-
     // Choose: Register or Login
     if (authMode === 'choose') {
       return (
@@ -836,13 +787,13 @@ export default function App() {
           <div style={{ width: '100%', maxWidth: '340px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'slideUp 0.6s ease 0.2s both' }}>
             <button
               style={{ ...S.btn, ...S.btnPrimary, width: '100%' }}
-              onClick={() => { setAuthMode('register'); setNameError(''); setNameInput('') }}
+              onClick={() => { setAuthMode('register'); setNameError(''); setNameInput(''); setPasswordInput('') }}
             >
               Neu hier? Registrieren 🚀
             </button>
             <button
               style={{ ...S.btn, ...S.btnSecondary, width: '100%' }}
-              onClick={() => { setAuthMode('login'); setNameError(''); setNameInput(''); setPinInput('') }}
+              onClick={() => { setAuthMode('login'); setNameError(''); setNameInput(''); setPasswordInput('') }}
             >
               Ich habe einen Account 🔑
             </button>
@@ -856,30 +807,37 @@ export default function App() {
       return (
         <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '24px', padding: '24px' }}>
           {header}
-          <div style={{ width: '100%', maxWidth: '340px', animation: 'slideUp 0.5s ease' }}>
+          <div style={{ width: '100%', maxWidth: '340px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'slideUp 0.5s ease' }}>
             <input
               style={{ ...S.input, borderColor: nameError ? COLORS.danger : COLORS.surfaceLight, textAlign: 'center' }}
               placeholder="Dein Name"
               value={nameInput}
               onChange={e => { setNameInput(e.target.value); setNameError('') }}
-              onKeyDown={e => e.key === 'Enter' && handleRegister()}
               maxLength={20}
               autoFocus
             />
+            <input
+              style={{ ...S.input, borderColor: nameError ? COLORS.danger : COLORS.surfaceLight, textAlign: 'center' }}
+              placeholder="Passwort wählen (min. 4 Zeichen)"
+              type="password"
+              value={passwordInput}
+              onChange={e => { setPasswordInput(e.target.value); setNameError('') }}
+              onKeyDown={e => e.key === 'Enter' && handleRegister()}
+            />
             {nameError && (
-              <p style={{ color: COLORS.danger, fontSize: '13px', marginTop: '8px', textAlign: 'center', animation: 'shake 0.4s ease' }}>
+              <p style={{ color: COLORS.danger, fontSize: '13px', textAlign: 'center', animation: 'shake 0.4s ease' }}>
                 {nameError}
               </p>
             )}
             <button
-              style={{ ...S.btn, ...S.btnPrimary, width: '100%', marginTop: '16px', opacity: nameLoading ? 0.6 : 1 }}
+              style={{ ...S.btn, ...S.btnPrimary, width: '100%', opacity: nameLoading ? 0.6 : 1 }}
               onClick={handleRegister}
               disabled={nameLoading}
             >
-              {nameLoading ? 'Wird geladen...' : 'Registrieren'}
+              {nameLoading ? 'Wird geladen...' : 'Registrieren 🚀'}
             </button>
             <button
-              style={{ ...S.backBtn, width: '100%', justifyContent: 'center', marginTop: '12px' }}
+              style={{ ...S.backBtn, width: '100%', justifyContent: 'center', marginTop: '4px' }}
               onClick={() => setAuthMode('choose')}
             >
               ← Zurück
@@ -905,9 +863,10 @@ export default function App() {
             />
             <input
               style={{ ...S.input, borderColor: nameError ? COLORS.danger : COLORS.surfaceLight, textAlign: 'center' }}
-              placeholder="Dein PIN (z.B. Fuchs33)"
-              value={pinInput}
-              onChange={e => { setPinInput(e.target.value); setNameError('') }}
+              placeholder="Dein Passwort"
+              type="password"
+              value={passwordInput}
+              onChange={e => { setPasswordInput(e.target.value); setNameError('') }}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
             />
             {nameError && (
