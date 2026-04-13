@@ -22,12 +22,19 @@ body {
 input, button, textarea, select {
   font-family: inherit;
   font-size: 16px;
+  color: #f1f5f9;
 }
 
 button {
   border: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  color: #f1f5f9;
+}
+
+html {
+  color-scheme: dark;
 }
 
 button:active {

@@ -839,6 +839,7 @@ const S = {
     padding: '20px',
     boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
     border: `1px solid rgba(255,255,255,0.05)`,
+    color: COLORS.text,
   },
   input: {
     width: '100%',
