@@ -1150,10 +1150,7 @@ export default function App() {
     return (
       <div style={{ ...S.screen, gap: '16px' }}>
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button style={S.backBtn} onClick={() => { finishSession() }}>
-            ← Zurück
-          </button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <span style={{ fontSize: '14px', color: COLORS.textMuted, fontWeight: '600' }}>
             {sessionIndex + 1} / {total}
           </span>
@@ -1246,6 +1243,14 @@ export default function App() {
           </div>
         )}
 
+        {/* Bottom Back Button */}
+        <button
+          style={{ ...S.btn, ...S.btnSecondary, width: '100%' }}
+          onClick={() => { finishSession() }}
+        >
+          ← Zurück
+        </button>
+
         {showLevelUp && <LevelUpOverlay level={newLevel} />}
       </div>
     )
@@ -1294,10 +1299,7 @@ export default function App() {
     return (
       <div style={{ ...S.screen, gap: '16px' }}>
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button style={S.backBtn} onClick={() => { finishQuiz() }}>
-            ← Zurück
-          </button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <span style={{ fontSize: '14px', color: COLORS.textMuted, fontWeight: '600' }}>
             {quizIndex + 1} / {QUIZ_SIZE}
           </span>
@@ -1385,6 +1387,14 @@ export default function App() {
           })}
         </div>
 
+        {/* Bottom Back Button */}
+        <button
+          style={{ ...S.btn, ...S.btnSecondary, width: '100%' }}
+          onClick={() => { finishQuiz() }}
+        >
+          ← Zurück
+        </button>
+
         {showLevelUp && <LevelUpOverlay level={newLevel} />}
       </div>
     )
@@ -1395,18 +1405,6 @@ export default function App() {
     const medals = ['🥇', '🥈', '🥉']
     return (
       <div style={{ ...S.screen, gap: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button style={S.backBtn} onClick={() => setScreen('home')}>
-            ← Zurück
-          </button>
-          <button
-            style={{ ...S.backBtn, color: COLORS.accentLight }}
-            onClick={loadLeaderboard}
-          >
-            {lbLoading ? '...' : '↻ Aktualisieren'}
-          </button>
-        </div>
-
         <h2 style={{ fontSize: 'clamp(22px, 5.5vw, 28px)', fontWeight: '700', textAlign: 'center' }}>
           🏆 Leaderboard
         </h2>
@@ -1471,6 +1469,23 @@ export default function App() {
               Laden...
             </div>
           )}
+        </div>
+
+        {/* Bottom Actions */}
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            style={{ ...S.btn, ...S.btnSecondary, flex: 1 }}
+            onClick={() => setScreen('home')}
+          >
+            ← Zurück
+          </button>
+          <button
+            style={{ ...S.btn, ...S.btnSecondary, flex: 1, color: COLORS.accentLight }}
+            onClick={loadLeaderboard}
+            disabled={lbLoading}
+          >
+            {lbLoading ? '...' : '↻ Aktualisieren'}
+          </button>
         </div>
       </div>
     )
