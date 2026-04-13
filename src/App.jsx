@@ -619,6 +619,84 @@ const XP_PER_LEVEL = 100
 const DAILY_GOAL = 15
 const SESSION_SIZE = 10
 const QUIZ_SIZE = 10
+const EMOJI_QUIZ_SIZE = 10
+
+// ============================================================
+// EMOJI-MAPPING für Bilder-Quiz (visueller Lerntyp)
+// ============================================================
+const EMOJIS = {
+  // Begrüßung
+  b01: '🌞', b02: '👋', b03: '🙏', b08: '🌅', b09: '🌆', b10: '🌙', b17: '🎉',
+  // Zahlen
+  z01: '1️⃣', z02: '2️⃣', z03: '3️⃣', z04: '4️⃣', z05: '5️⃣', z06: '6️⃣', z07: '7️⃣', z08: '8️⃣', z09: '9️⃣', z10: '🔟',
+  z11: '2️⃣0️⃣', z13: '💯', z15: '0️⃣',
+  // Essen & Trinken
+  e01: '💧', e02: '🍞', e03: '🥛', e04: '☕', e05: '🍵', e06: '🍺', e07: '🍷', e08: '🍎', e09: '🧀', e10: '🥩',
+  e11: '🥗', e12: '🍲', e13: '🍦', e14: '🍊', e15: '🍌', e16: '🍇', e17: '🥦', e18: '🐟', e19: '🍚', e20: '🍝',
+  e21: '🥔', e22: '🍅', e23: '🥒', e24: '🌶️', e25: '🧅', e26: '🧄', e27: '🧂', e29: '🍬', e30: '🧈', e31: '🫒',
+  e32: '🍯', e33: '🍓', e34: '🥚', e35: '🍗', e36: '🐖', e37: '🐄', e38: '🌭', e39: '🍫', e40: '🎂', e41: '🍪',
+  e42: '🧃', e43: '🥤', e44: '🥐', e45: '🍽️', e46: '🌃',
+  // Familie
+  f01: '👩', f02: '👨', f03: '👦', f04: '👧', f05: '🤝', f06: '🧒', f07: '👵', f08: '👴', f09: '👨‍👩‍👧‍👦',
+  f11: '🧑', f12: '👩‍🦱', f13: '👦', f14: '👧', f15: '🤵', f16: '👰', f17: '👫',
+  // Orte
+  o01: '🏠', o02: '🏫', o03: '🏙️', o04: '🏰', o05: '🇸🇮', o06: '⛰️', o07: '🌊', o08: '🏞️', o09: '🏞️', o10: '🌲',
+  o11: '🏖️', o12: '🏪', o13: '🌳', o15: '🛣️', o16: '🍽️', o17: '☕', o18: '🍸', o19: '🏨', o20: '🏦', o21: '📮',
+  o22: '🏥', o23: '⛪', o24: '📚',
+  // Farben
+  c01: '🔴', c02: '🔵', c03: '🟢', c04: '⚪', c05: '⚫', c06: '🟡', c07: '🟠', c08: '🟤', c09: '🌸', c10: '🟣',
+  c11: '🔘', c12: '🥇', c13: '🥈',
+  // Körper
+  k01: '🧠', k02: '🖐️', k03: '🦵', k04: '👀', k05: '❤️', k06: '👨‍⚕️', k07: '💊', k08: '🤒', k09: '😀', k10: '👂',
+  k11: '👃', k12: '👄', k13: '🦷', k14: '👅', k15: '💇', k16: '☝️', k17: '🦵', k22: '🧴', k23: '🩸',
+  // Zeit
+  t01: '📅', t02: '⏭️', t03: '⏮️', t04: '1️⃣', t14: '🕐', t15: '⏰',
+  // Pronomen (wenige)
+  p01: '🙋', p02: '👉',
+  // Verben
+  v03: '🚶', v04: '🏃', v05: '👀', v06: '👂', v07: '💬', v11: '🍴', v12: '🥤', v13: '😴', v14: '💼', v16: '💕',
+  v19: '🛒', v20: '🤝', v21: '✍️', v22: '📖', v25: '🏊', v26: '💃', v27: '🎤', v28: '😂', v29: '😢', v30: '❓',
+  v33: '✋', v34: '🎁', v38: '🚪', v40: '🏁', v46: '🎮', v47: '✈️', v48: '🚗', v49: '🛫', v50: '👨‍🍳',
+  // Adjektive (nur klare)
+  a01: '👍', a02: '👎', a03: '🐘', a04: '🐁', a05: '😍', a07: '✨', a08: '👴', a09: '⚡', a10: '🐢', a11: '🔥',
+  a12: '🧊', a13: '🌶️', a14: '😋', a15: '💧', a16: '😴', a17: '😄', a18: '😢', a19: '📏', a23: '🗻', a25: '🏋️',
+  a27: '💪', a29: '💰', a31: '🌑', a32: '💡', a33: '📢', a34: '🤫', a41: '🍷', a42: '🥛',
+  // Alltag
+  d01: '💰', d02: '🚗', d03: '📱', d04: '📖', d05: '🔑', d06: '🚪', d07: '🪟', d08: '🪑', d09: '💺', d10: '🛏️',
+  d11: '💼', d13: '🎵', d14: '🎬', d15: '🎲', d18: '✉️', d19: '🎁', d20: '💐', d21: '📸', d22: '🗺️', d23: '📅',
+  d24: '📰', d25: '✏️',
+  // Wetter & Natur
+  w01: '☀️', w02: '🌧️', w03: '❄️', w04: '💨', w05: '☁️', w06: '🌌', w07: '🌳', w08: '🌸', w09: '🐕', w10: '🐈',
+  w11: '🌧️', w12: '🌨️', w13: '🌫️', w14: '⛈️', w15: '🥶', w16: '🌡️', w17: '🌷', w18: '☀️',
+  n01: '🍂', n02: '⛄', n03: '🌱', n04: '🍃', n05: '⭐', n06: '🌙',
+  // Richtungen
+  r01: '⬅️', r02: '➡️', r03: '⬆️', r04: '⬇️', r05: '🔼', r06: '📍',
+  // Kleidung
+  cl01: '👕', cl02: '👔', cl03: '👕', cl04: '👖', cl05: '👗', cl06: '👗', cl07: '👟', cl08: '🧦', cl09: '🧥',
+  cl10: '🧥', cl11: '🧢', cl12: '🎩', cl13: '🧤', cl14: '🎗️', cl15: '👜', cl16: '☂️',
+  // Tiere
+  an01: '🐾', an02: '🐄', an03: '🐴', an04: '🐖', an05: '🐑', an06: '🐐', an07: '🐔', an08: '🦆', an09: '🐦',
+  an10: '🐁', an11: '🐇', an12: '🦊', an13: '🐻', an14: '🐺', an15: '🦌', an16: '🐸', an17: '🐍', an18: '🕷️',
+  an19: '🪰', an20: '🐝', an21: '🦋', an22: '🐜',
+  // Transport
+  tr01: '🚂', tr02: '🚌', tr03: '✈️', tr04: '🚢', tr05: '🚲', tr06: '🏍️', tr07: '🚕', tr08: '🚉', tr09: '🛫',
+  tr10: '🎫', tr11: '🛣️', tr12: '🌉',
+  // Berufe
+  j01: '👨‍🏫', j02: '👮', j03: '👨‍🍳', j04: '🤵', j05: '💁', j06: '🎓', j07: '👷', j08: '👨‍💻', j09: '🚗',
+  j10: '🎨', j11: '✍️', j12: '🎸', j13: '💇', j14: '🧑‍🚒', j15: '👩‍⚕️',
+  // Hobbys
+  h01: '🏅', h02: '⚽', h03: '🏀', h04: '🎾', h05: '🏊', h06: '🚴', h07: '📷', h08: '👨‍🍳', h09: '📖', h10: '✈️',
+  h11: '💃', h12: '🎤', h13: '🏛️', h14: '🎒', h15: '🎉',
+  // Emotionen
+  em01: '😠', em02: '😄', em03: '😍', em04: '😲', em05: '😨', em06: '🌟', em07: '😡', em08: '🥳', em09: '😑',
+  em10: '🦁', em11: '😤', em12: '😳',
+  // Haus
+  ho01: '🚪', ho02: '🍳', ho03: '🛁', ho04: '🛏️', ho05: '🛋️', ho06: '🚽', ho07: '🚶', ho08: '🏢', ho09: '🌻',
+  ho10: '🏠', ho11: '⬇️', ho12: '🏢',
+  // Technologie
+  te01: '💻', te02: '🌐', te03: '🔗', te04: '📧', te05: '💬', te06: '📷', te07: '🖥️', te08: '⌨️', te09: '📱',
+  te10: '🔒',
+}
 
 const CAT_ICONS = {
   'Begrüßung': '👋',
@@ -851,6 +929,13 @@ export default function App() {
   const [quizOptions, setQuizOptions] = useState([])
   const [quizAnswered, setQuizAnswered] = useState(null)
   const [quizStats, setQuizStats] = useState({ correct: 0, wrong: 0, xpEarned: 0 })
+
+  // Emoji-Quiz (Bilder-Quiz)
+  const [emojiQuizCards, setEmojiQuizCards] = useState([])
+  const [emojiQuizIndex, setEmojiQuizIndex] = useState(0)
+  const [emojiQuizOptions, setEmojiQuizOptions] = useState([])
+  const [emojiQuizAnswered, setEmojiQuizAnswered] = useState(null)
+  const [emojiQuizStats, setEmojiQuizStats] = useState({ correct: 0, wrong: 0, xpEarned: 0 })
 
   // Leaderboard
   const [leaderboard, setLeaderboard] = useState([])
@@ -1185,6 +1270,82 @@ export default function App() {
     const today = getToday()
     const reviewed = (player.today_reviewed || 0) + quizStats.correct + quizStats.wrong
     const newXp = (player.xp || 0) + quizStats.xpEarned
+    let streakCount = player.streak_count || 0
+    let streakLast = player.streak_last_date
+    if (streakLast !== today) {
+      streakCount += 1
+      streakLast = today
+    }
+    await syncPlayer({
+      xp: newXp,
+      today_reviewed: reviewed,
+      today_date: today,
+      streak_count: streakCount,
+      streak_last_date: streakLast,
+    })
+    setScreen('home')
+  }
+
+  // --------------------------------------------------------
+  // EMOJI-QUIZ (Bilder-Quiz)
+  // --------------------------------------------------------
+  function startEmojiQuiz() {
+    const vocabWithEmoji = VOCAB.filter(v => EMOJIS[v.id])
+    if (vocabWithEmoji.length < 4) {
+      setError('Nicht genug Vokabeln mit Bildern.')
+      setTimeout(() => setError(''), 2500)
+      return
+    }
+    const cards = shuffle(vocabWithEmoji).slice(0, EMOJI_QUIZ_SIZE)
+    setEmojiQuizCards(cards)
+    setEmojiQuizIndex(0)
+    setEmojiQuizAnswered(null)
+    setEmojiQuizStats({ correct: 0, wrong: 0, xpEarned: 0 })
+    generateEmojiQuizOptions(cards, 0)
+    setScreen('emojiQuiz')
+  }
+
+  function generateEmojiQuizOptions(cards, idx) {
+    const card = cards[idx]
+    if (!card) return
+    const sameCat = VOCAB.filter(v => v.cat === card.cat && v.id !== card.id && EMOJIS[v.id])
+    const otherCat = VOCAB.filter(v => v.cat !== card.cat && EMOJIS[v.id])
+    let distractors = shuffle(sameCat).slice(0, 3)
+    while (distractors.length < 3) {
+      const extra = shuffle(otherCat).find(v => !distractors.some(d => d.id === v.id))
+      if (extra) distractors.push(extra)
+      else break
+    }
+    setEmojiQuizOptions(shuffle([card, ...distractors]))
+  }
+
+  function handleEmojiQuizAnswer(selectedId) {
+    if (emojiQuizAnswered !== null) return
+    const card = emojiQuizCards[emojiQuizIndex]
+    const correct = selectedId === card.id
+    setEmojiQuizAnswered(selectedId)
+    setEmojiQuizStats(s => ({
+      correct: s.correct + (correct ? 1 : 0),
+      wrong: s.wrong + (correct ? 0 : 1),
+      xpEarned: s.xpEarned + (correct ? 15 : 0),
+    }))
+    if (correct) speak(card.sl)
+    setTimeout(() => {
+      const next = emojiQuizIndex + 1
+      if (next >= emojiQuizCards.length) {
+        setEmojiQuizIndex(next)
+      } else {
+        setEmojiQuizIndex(next)
+        setEmojiQuizAnswered(null)
+        generateEmojiQuizOptions(emojiQuizCards, next)
+      }
+    }, 1500)
+  }
+
+  async function finishEmojiQuiz() {
+    const today = getToday()
+    const reviewed = (player.today_reviewed || 0) + emojiQuizStats.correct + emojiQuizStats.wrong
+    const newXp = (player.xp || 0) + emojiQuizStats.xpEarned
     let streakCount = player.streak_count || 0
     let streakLast = player.streak_last_date
     if (streakLast !== today) {
@@ -1537,6 +1698,35 @@ export default function App() {
               cursor: 'pointer',
               touchAction: 'manipulation',
               textAlign: 'left',
+              animation: 'fadeIn 0.4s ease 0.35s both',
+              border: `1px solid rgba(168, 85, 247, 0.2)`,
+            }}
+            onClick={startEmojiQuiz}
+          >
+            <div style={{
+              width: '52px', height: '52px', borderRadius: '14px',
+              background: 'rgba(168, 85, 247, 0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '24px', flexShrink: 0,
+            }}>🖼️</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: '700', fontSize: 'clamp(16px, 4vw, 18px)' }}>Bilder-Quiz</div>
+              <div style={{ fontSize: '13px', color: COLORS.textMuted, marginTop: '2px' }}>
+                Lerne mit Bildern
+              </div>
+            </div>
+            <div style={{ color: COLORS.textDim, fontSize: '20px' }}>›</div>
+          </button>
+
+          <button
+            style={{
+              ...S.card,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              cursor: 'pointer',
+              touchAction: 'manipulation',
+              textAlign: 'left',
               animation: 'fadeIn 0.4s ease 0.4s both',
             }}
             onClick={() => { loadLeaderboard(); setScreen('leaderboard') }}
@@ -1866,6 +2056,157 @@ export default function App() {
         <button
           style={{ ...S.btn, ...S.btnSecondary, width: '100%' }}
           onClick={() => { finishQuiz() }}
+        >
+          ← Zurück
+        </button>
+
+        {showLevelUp && <LevelUpOverlay level={newLevel} />}
+      </div>
+    )
+  }
+
+  // -- Emoji Quiz (Bilder-Quiz) --
+  if (screen === 'emojiQuiz') {
+    const done = emojiQuizIndex >= emojiQuizCards.length
+
+    if (done) {
+      return (
+        <div style={{ ...S.screen, alignItems: 'center', justifyContent: 'center', gap: '24px', padding: '24px' }}>
+          <div style={{ textAlign: 'center', animation: 'popIn 0.5s ease' }}>
+            <div style={{ fontSize: '64px', marginBottom: '16px' }}>
+              {emojiQuizStats.correct >= 7 ? '🖼️' : emojiQuizStats.correct >= 4 ? '👀' : '📚'}
+            </div>
+            <h2 style={{ fontSize: 'clamp(22px, 5.5vw, 28px)', fontWeight: '700' }}>Bilder-Quiz fertig!</h2>
+          </div>
+          <div style={{ ...S.card, width: '100%', maxWidth: '340px', animation: 'slideUp 0.5s ease 0.2s both' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
+              <div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: COLORS.accentLight }}>{emojiQuizStats.correct}</div>
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>Richtig</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: COLORS.danger }}>{emojiQuizStats.wrong}</div>
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>Falsch</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: COLORS.gold }}>+{emojiQuizStats.xpEarned}</div>
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>XP</div>
+              </div>
+            </div>
+          </div>
+          <button
+            style={{ ...S.btn, ...S.btnPrimary, width: '100%', maxWidth: '340px' }}
+            onClick={finishEmojiQuiz}
+          >
+            Weiter
+          </button>
+        </div>
+      )
+    }
+
+    const card = emojiQuizCards[emojiQuizIndex]
+    return (
+      <div style={{ ...S.screen, gap: '16px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <span style={{ fontSize: '14px', color: COLORS.textMuted, fontWeight: '600' }}>
+            {emojiQuizIndex + 1} / {EMOJI_QUIZ_SIZE}
+          </span>
+        </div>
+
+        {/* Progress */}
+        <div style={S.progressBar}>
+          <div style={{
+            ...S.progressFill,
+            width: `${(emojiQuizIndex / EMOJI_QUIZ_SIZE) * 100}%`,
+            background: 'linear-gradient(90deg, #a855f7, #c084fc)',
+          }} />
+        </div>
+
+        {/* Emoji Display */}
+        <div style={{
+          ...S.card,
+          textAlign: 'center',
+          padding: '24px 20px',
+          animation: 'fadeIn 0.3s ease',
+          background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.03))',
+          border: '1px solid rgba(168, 85, 247, 0.2)',
+        }}>
+          <div style={{ fontSize: '13px', color: COLORS.textMuted, marginBottom: '8px' }}>
+            Was siehst du?
+          </div>
+          <div style={{
+            fontSize: 'clamp(80px, 20vw, 120px)',
+            lineHeight: 1,
+            padding: '16px 0',
+            animation: 'popIn 0.4s ease',
+          }}>
+            {EMOJIS[card.id]}
+          </div>
+          <div style={{ fontSize: '13px', color: COLORS.textDim, marginTop: '4px' }}>
+            Wähle das richtige slowenische Wort
+          </div>
+        </div>
+
+        {/* Options */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+          {emojiQuizOptions.map(opt => {
+            const isCorrect = opt.id === card.id
+            const isSelected = emojiQuizAnswered === opt.id
+            const showResult = emojiQuizAnswered !== null
+            let bg = COLORS.surface
+            let borderColor = 'rgba(255,255,255,0.08)'
+            if (showResult && isCorrect) {
+              bg = 'rgba(5, 150, 105, 0.2)'
+              borderColor = COLORS.accentLight
+            } else if (showResult && isSelected && !isCorrect) {
+              bg = 'rgba(239, 68, 68, 0.2)'
+              borderColor = COLORS.danger
+            }
+            return (
+              <button
+                key={opt.id}
+                style={{
+                  ...S.card,
+                  padding: '16px 20px',
+                  cursor: showResult ? 'default' : 'pointer',
+                  touchAction: 'manipulation',
+                  fontSize: 'clamp(16px, 4vw, 18px)',
+                  fontWeight: '600',
+                  textAlign: 'left',
+                  background: bg,
+                  borderColor,
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                }}
+                onClick={() => handleEmojiQuizAnswer(opt.id)}
+              >
+                <span style={{ flex: 1 }}>{opt.sl}</span>
+                {showResult && isCorrect && <span style={{ animation: 'popIn 0.3s ease' }}>✅</span>}
+                {showResult && isSelected && !isCorrect && <span style={{ animation: 'shake 0.4s ease' }}>❌</span>}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Show translation after answer */}
+        {emojiQuizAnswered !== null && (
+          <div style={{
+            textAlign: 'center',
+            fontSize: '14px',
+            color: COLORS.textMuted,
+            animation: 'fadeIn 0.3s ease',
+          }}>
+            = <strong style={{ color: COLORS.text }}>{card.de}</strong>
+          </div>
+        )}
+
+        {/* Bottom Back Button */}
+        <button
+          style={{ ...S.btn, ...S.btnSecondary, width: '100%' }}
+          onClick={finishEmojiQuiz}
         >
           ← Zurück
         </button>
